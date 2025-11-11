@@ -1,8 +1,10 @@
-import {ReactNode, createContext, useState} from 'react';
+import {createContext, ReactNode, useState} from 'react';
+import {useTheme, ThemeMode} from '../hooks/useTheme';
 
-interface SettingsContextProps {
+interface SettingsContextValue {
   darkMode: boolean;
-  setDarkMode: (v: boolean) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (v: ThemeMode) => void;
   autoCheckin: boolean;
   setAutoCheckin: (v: boolean) => void;
   rapidMode: boolean;
@@ -17,9 +19,10 @@ interface SettingsContextProps {
   setRequireRegistrationStateComplete: (v: boolean) => void;
 }
 
-export const SettingsContext = createContext<SettingsContextProps>({
+export const SettingsContext = createContext<SettingsContextValue>({
   darkMode: false,
-  setDarkMode: () => {},
+  themeMode: 'system',
+  setThemeMode: () => {},
   autoCheckin: false,
   setAutoCheckin: () => {},
   rapidMode: false,
@@ -35,13 +38,7 @@ export const SettingsContext = createContext<SettingsContextProps>({
 });
 
 export const SettingsProvider = ({children}: {children: ReactNode}) => {
-  // On render, check if the user has a theme preference. If not, check if their system is set to dark mode. If so, set the theme to dark.
-  // If neither, set the theme to light.
-  const storedTheme = localStorage.getItem('theme');
-  const isDarkMode =
-    storedTheme === 'dark' ||
-    (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [darkMode, setDarkMode] = useState(isDarkMode);
+  const {themeMode, setThemeMode, darkMode} = useTheme();
 
   const storedAutoCheckin = JSON.parse(localStorage.getItem('autoCheckin') || 'false');
   const [autoCheckin, setAutoCheckin] = useState(storedAutoCheckin);
@@ -67,7 +64,8 @@ export const SettingsProvider = ({children}: {children: ReactNode}) => {
     <SettingsContext.Provider
       value={{
         darkMode,
-        setDarkMode,
+        themeMode,
+        setThemeMode,
         autoCheckin,
         setAutoCheckin,
         rapidMode,
