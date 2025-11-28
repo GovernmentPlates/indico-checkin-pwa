@@ -17,6 +17,8 @@ interface SettingsContextValue {
   setScanDevice: (v: string) => void;
   requireRegistrationStateComplete: boolean;
   setRequireRegistrationStateComplete: (v: boolean) => void;
+  showDevDebugBar: boolean;
+  setShowDevDebugBar: (v: boolean) => void;
 }
 
 export const SettingsContext = createContext<SettingsContextValue>({
@@ -35,6 +37,8 @@ export const SettingsContext = createContext<SettingsContextValue>({
   setScanDevice: () => {},
   requireRegistrationStateComplete: false,
   setRequireRegistrationStateComplete: () => {},
+  showDevDebugBar: false,
+  setShowDevDebugBar: () => {},
 });
 
 export const SettingsProvider = ({children}: {children: ReactNode}) => {
@@ -60,6 +64,11 @@ export const SettingsProvider = ({children}: {children: ReactNode}) => {
     storedRequireRegistrationStateComplete
   );
 
+  const isProd = import.meta.env.PROD;
+  const storedShowDevDebugBar =
+    JSON.parse(localStorage.getItem('showDevDebugBar') || 'false') && !isProd;
+  const [showDevDebugBar, setShowDevDebugBar] = useState(storedShowDevDebugBar);
+
   return (
     <SettingsContext.Provider
       value={{
@@ -78,6 +87,8 @@ export const SettingsProvider = ({children}: {children: ReactNode}) => {
         setHapticFeedback,
         requireRegistrationStateComplete,
         setRequireRegistrationStateComplete,
+        showDevDebugBar,
+        setShowDevDebugBar,
       }}
     >
       {children}

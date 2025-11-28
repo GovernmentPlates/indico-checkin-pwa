@@ -9,6 +9,7 @@ import {
   ScrollRestoration,
 } from 'react-router-dom';
 import BottomNav from './Components/BottomNav';
+import DebugToolbar from './Components/DebugToolbar';
 import ExternalQrScanner from './Components/QrScanner/ExternalQrScanner';
 import Modal from './Components/Tailwind/Modal/Modal';
 import db, {
@@ -69,6 +70,7 @@ function RootPage() {
       <Outlet />
       {bottomNavVisible && <BottomNav />}
       {scanDevice !== scanDevices.camera && <ExternalQrScanner />}
+      <DebugToolbar />
     </>
   );
 }

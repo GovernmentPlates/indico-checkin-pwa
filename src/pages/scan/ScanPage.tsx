@@ -66,6 +66,7 @@ export default function ScanPage() {
       const decodedText = await scanFile(file);
       onScanResult(decodedText, null);
     } catch (e) {
+      logError(`Error scanning file: ${e}`);
       errorModal({title: 'Error processing QR code', content: e instanceof Error ? e.message : ''});
     }
   };

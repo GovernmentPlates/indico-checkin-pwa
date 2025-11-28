@@ -1,4 +1,6 @@
 import {ArrowPathIcon, DocumentDuplicateIcon} from '@heroicons/react/20/solid';
+import {DocumentTextIcon} from '@heroicons/react/24/outline';
+import {SettingToggle} from '../../Components/SettingsToggle';
 import {Typography} from '../../Components/Tailwind';
 import Button, {DangerButton} from '../../Components/Tailwind/Button';
 import TopNav from '../../Components/TopNav';
@@ -7,6 +9,7 @@ import db from '../../db/db';
 import {useHandleError} from '../../hooks/useError';
 import {useLogs} from '../../hooks/useLogs';
 import {useConfirmModal} from '../../hooks/useModal';
+import useSettings from '../../hooks/useSettings';
 
 export default function DebuggingPage() {
   const version = import.meta.env.VITE_APP_VERSION;
@@ -14,6 +17,7 @@ export default function DebuggingPage() {
   const {logs} = useLogs();
   const confirmModal = useConfirmModal();
   const handleError = useHandleError();
+  const {showDevDebugBar, setShowDevDebugBar} = useSettings();
 
   async function resetApp() {
     localStorage.clear();
@@ -29,6 +33,12 @@ export default function DebuggingPage() {
     const text = `App version: ${version}\n\nLogs:\n${formatLogs(logs)}`;
     navigator.clipboard.writeText(text);
   }
+
+  const toggleDevDebugBar = () => {
+    const prev = !showDevDebugBar;
+    localStorage.setItem('showDevDebugBar', prev.toString());
+    setShowDevDebugBar(prev);
+  };
 
   return (
     <>
@@ -58,6 +68,17 @@ export default function DebuggingPage() {
         </div>
 
         {!isProduction && (
+          <SettingToggle
+            title="Show developer debug bar"
+            description="Show additional debugging information at the bottom of the screen"
+            checked={
+              !isProduction && JSON.parse(localStorage.getItem('showDevDebugBar') || 'false')
+            }
+            onToggle={toggleDevDebugBar}
+          />
+        )}
+
+        {!isProduction && (
           <div>
             <Typography variant="h4" className="mb-4">
               Logs
@@ -74,7 +95,14 @@ export default function DebuggingPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                {logs.length === 0 && <Typography variant="body2">No logs available</Typography>}
+                {logs.length === 0 && (
+                  <div className="flex max-h-[40vh] flex-col items-center justify-items-center overflow-y-auto rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+                    <DocumentTextIcon className="h-12 w-12 text-gray-400" />
+                    <Typography variant="h4" className="mt-2 text-gray-400">
+                      No logs available
+                    </Typography>
+                  </div>
+                )}
                 {logs.length > 0 && (
                   <div className="flex max-h-[40vh] flex-col-reverse overflow-y-auto rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
                     <code className="flex flex-col gap-2">
